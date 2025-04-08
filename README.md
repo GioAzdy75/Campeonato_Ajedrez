@@ -2,8 +2,8 @@
 ## Campeonato de Ajedrez
 
 ## Modelo
-![alt text](image.png)
 
+![alt text](image1.png)
 ## 
 
 para ver todo el grafo:

@@ -59,7 +59,8 @@ MATCH (n) RETURN n;
 
 6. **¿Qué partidas jugó un jugador, con qué color y qué apertura usó?**
    ```
-   
+   MATCH (j:Jugador)-[c:JUGO_PARTIDA_COMO]->(p:Partida)
+   RETURN j.nombre AS Nombre, c.color AS Color, c.apertura AS Apertura, p.nombre AS Partida
    ```
 
 7. **¿Cantidad total de partidas con su tasa de victoria?**

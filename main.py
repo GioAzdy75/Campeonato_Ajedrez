@@ -2,6 +2,8 @@ import requests
 import json
 from datetime import datetime
 from neo4j import GraphDatabase
+import time
+
 
 #Conexión a Neo4j
 uri = "bolt://localhost:7687"
@@ -12,6 +14,7 @@ driver = GraphDatabase.driver(uri, auth=(user, password))
 
 #Función para insertar todo
 def cargar_info(tx, partida, jugador_info):
+    time.sleep(1)  # Retraso de 1 segundo
     white = partida["players"]["white"]["user"]["name"] if "user" in partida["players"]["white"] else "Anon"
     black = partida["players"]["black"]["user"]["name"] if "user" in partida["players"]["black"] else "Anon"
 
@@ -109,7 +112,7 @@ def cargar_info(tx, partida, jugador_info):
     nombre_bu="Bullet", puntos_bu=bullet["rating"], total_bu=bullet["games"],
     nombre_bl="Blitz", puntos_bl=blitz["rating"], total_bl=blitz["games"],
     nombre_ra="Rapid", puntos_ra=rapid["rating"], total_ra=rapid["games"],
-    nombre_cl="Classical", puntos_cl=classical["rating"], total_cl=classical["games"])
+    nombre_cl="Classical", puntos_cl=classical["rating"], total_cl=classical["games"])        
 
 
 # Inicio del programa

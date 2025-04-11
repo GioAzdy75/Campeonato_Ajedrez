@@ -9,7 +9,3 @@ CREATE
   (:Jugador {nombre: "Wei, Yi", maximo_elo: 2758, nacimiento: 1999, username_lichess: "null", titulo: "GM"}),
   (:Jugador {nombre: "Nepomniachtchi, Ian", maximo_elo: 2757, nacimiento: 1990, username_lichess: "null", titulo: "GM"}),
   (:Jugador {nombre: "Firouzja, Alireza", maximo_elo: 2757, nacimiento: 2003, username_lichess: "alireza2003", titulo: "GM"});
-
-
-["Carlsen, Magnus",,"Nakamura, Hikaru","Gukesh D","Erigaisi Arjun","Caruana, Fabiano","Abdusattorov, Nodirbek","Praggnanandhaa R","Wei, Yi","Nepomniachtchi, Ian","Firouzja, Alireza"]
-["DrDrunkenstein","TSMFTXH","guki1124","Inventing_Invention","null","null","Praggnanandhaachess","null","null","alireza2003"]

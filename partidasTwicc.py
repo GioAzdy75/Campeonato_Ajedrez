@@ -1,5 +1,12 @@
 import chess.pgn
 
+
+jugadoresDicNombres = {"Carlsen,M": "Carlsen, Magnus"}
+
+
+def normalizarNombres(name, hash):
+    return hash.get(name, name)
+
 def extraer_datos_partida(pgn_game, idx):
     headers = pgn_game.headers
 
@@ -19,25 +26,25 @@ def extraer_datos_partida(pgn_game, idx):
     c = f"c{idx}"
 
     return f"""
-MERGE ({c}:Campeonato {{
-    nombre: "{torneo}",
-    ubicacion: "{lugar}"
-}})
-MERGE ({p}:Partida {{
-    id: "{id_partida}",
-    fecha: "{fecha}",
-    resultado: "{resultado}",
-    ronda: "{ronda}",
-    apertura: "{apertura}",
-    nombre: "{blanca} vs {negra}"
-}})
-MERGE ({j1}:Jugador {{nombre: "{blanca}"}})
-MERGE ({j2}:Jugador {{nombre: "{negra}"}})
-MERGE ({j1})-[:JUGO_PARTIDA_COMO {{color: "blanca"}}]->({p})
-MERGE ({j2})-[:JUGO_PARTIDA_COMO {{color: "negra"}}]->({p})
-MERGE ({j1})-[:USO_APERTURA_EN]->({p})
-MERGE ({c})-[:INCLUYE_PARTIDA]->({p});
-""".strip()
+            MERGE ({c}:Campeonato {{
+                nombre: "{torneo}",
+                ubicacion: "{lugar}"
+            }})
+            MERGE ({p}:Partida {{
+                id: "{id_partida}",
+                fecha: "{fecha}",
+                resultado: "{resultado}",
+                ronda: "{ronda}",
+                apertura: "{apertura}",
+                nombre: "{blanca} vs {negra}"
+            }})
+            MERGE ({j1}:Jugador {{nombre: "{normalizarNombres(blanca,jugadoresDicNombres)}"}})
+            MERGE ({j2}:Jugador {{nombre: "{normalizarNombres(negra,jugadoresDicNombres)}"}})
+            MERGE ({j1})-[:JUGO_PARTIDA_COMO {{color: "blanca"}}]->({p})
+            MERGE ({j2})-[:JUGO_PARTIDA_COMO {{color: "negra"}}]->({p})
+            MERGE ({j1})-[:USO_APERTURA_EN]->({p})
+            MERGE ({c})-[:INCLUYE_PARTIDA]->({p});
+            """.strip()
 
 def procesar_pgn_twic(pgn_path, max_partidas=30):
     cypher_lines = []

@@ -1,0 +1,23 @@
+[
+    {
+        "Nombre": "Nepomniachtchi, Ian",
+        "Federación": "Russian Federation",
+        "Título": "Grand Master",
+        "ELO Clásico": "2757",
+        "Nacimiento": "1990"
+    },
+    {
+        "Nombre": "Ding, Liren",
+        "Federación": "China",
+        "Título": "Grand Master",
+        "ELO Clásico": "2734",
+        "Nacimiento": "1992"
+    },
+    {
+        "Nombre": "Carlsen, Magnus",
+        "Federación": "Norway",
+        "Título": "Grand Master",
+        "ELO Clásico": "2837",
+        "Nacimiento": "1990"
+    }
+]

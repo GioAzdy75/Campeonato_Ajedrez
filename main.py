@@ -1,4 +1,5 @@
 from neo4j import GraphDatabase
+import os
 
 # Establecer la conexión con Neo4j
 uri = "bolt://localhost:7687"  # Cambia la URL según sea necesario
@@ -35,12 +36,16 @@ def ejecutar_archivo_cql(archivo_cql):
 # Llamar a la función para ejecutar el archivo CQL
 #archivo_cql = 'datosPartidas/partidasLichess/datosLichess0.cypher'  # Reemplaza con la ruta a tu archivo .cql
 
-archivo_cql = 'datosPartidas/twic_partidas.cypher'  # Reemplaza con la ruta a tu archivo .cql
+
+def procesar_archivos_en_carpeta(carpeta, max_partidas=30):
+    # Listar todos los archivos en el directorio
+    for archivo in os.listdir(carpeta):
+        if archivo.endswith(".cypher"):  # Solo procesar archivos .pgn
+            archivo_path = os.path.join(carpeta, archivo)
+            ejecutar_archivo_cql(archivo_path)
 
 print("-Inicio programa-")
-ejecutar_archivo_cql('datosPartidas/cypherCode/datos10GMs.cypher')
-ejecutar_archivo_cql('datosPartidas/cypherCode/datosPaisesFederaciones.cypher')
-ejecutar_archivo_cql('datosPartidas/cypherCode/relacionesPaisesFederaciones.cypher')
-ejecutar_archivo_cql('datosPartidas/cypherCode/datosLichess0.cypher')
-ejecutar_archivo_cql('datosPartidas/cypherCode/twic_partidas.cypher')
+archivo_cypher = 'datosPartidas/'  # Reemplaza con la ruta a tu archivo .cql
+procesar_archivos_en_carpeta(archivo_cypher)
+
 print('-Fin-')

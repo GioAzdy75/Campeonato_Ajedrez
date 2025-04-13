@@ -8,7 +8,6 @@ jugadoresDicNombres = {"Carlsen,M": "Carlsen, Magnus"}
 
 setJugadores = set()
 
-
 def procesar_nombre(nombre):
     if nombre not in setJugadores:
         setJugadores.add(nombre)
@@ -30,6 +29,7 @@ def normalizarResultado(key):
         return "tablas"
 
 def extraer_datos_partida(pgn_game, idx):
+    '''Extrae los datos del pgn y lo traduce a codigo cypher'''
     headers = pgn_game.headers
     torneo = headers.get("Event", "Torneo desconocido")
     lugar = headers.get("Site", "") 
@@ -106,6 +106,7 @@ def procesar_pgn_twic(pgn_path, max_partidas=30):
 
 '''
 def procesar_pgn_twic(pgn_path, max_partidas=30 , index = ''):
+    '''abre el archivo pgn y ejecuta la traduccion guardando los archivos'''
     cypher_lines = []
     with open(pgn_path, encoding="utf-8") as f:
         for idx in range(max_partidas):
@@ -115,18 +116,14 @@ def procesar_pgn_twic(pgn_path, max_partidas=30 , index = ''):
             cypher = extraer_datos_partida(game, idx+1)
             cypher_lines.append(cypher)
             
-    with open(f"datosPartidas/twic_partidas{index}.cypher", "w", encoding="utf-8") as f:
+    with open(f"datosPartidas/cypherCode/data{index}.cypher", "w", encoding="utf-8") as f:
         f.write("\n\n".join(cypher_lines))
 
     print(f"Archivo '{pgn_path.split('/')[-1]}' procesado correctamente.")
 
 
-#procesar_pgn_twic("datosPartidas/pgnTorneos/twic1421.pgn", 100) 
-
-
-
-
 def procesar_archivos_en_carpeta(carpeta_pgn, max_partidas=30):
+    '''Traduce todos los archivos .pgn que existen dentro de una carpeta'''
     index = 1
     # Listar todos los archivos en el directorio
     for archivo in os.listdir(carpeta_pgn):
@@ -179,7 +176,6 @@ def leer_json(ruta_json):
     with open(ruta_json, 'r', encoding='utf-8') as f:
         return json.load(f)
 
-
 def procesarjugadores(json_path, index = ''):
     jugadores_json = leer_json(json_path)
     cypher_lines = []
@@ -192,19 +188,14 @@ def procesarjugadores(json_path, index = ''):
     print(f"Archivo '{json_path.split('/')[-1]}' procesado correctamente.")
 
 
-# Llamar a la función para procesar todos los archivos en la carpeta "datosPartidas/pgnTorneos"
-print("Extraccion datos pgn")
-#procesar_archivos_en_carpeta("datosPartidas/pgnTorneos", 100)
-print("Creacion cypher partidas torneos jugadores")
-print("Extraccion datos jugadores")
-setJugadoresNormalizado = set()
-for j in setJugadores:
-    j = j.split(",")
-    j = j[1][1:] + " " +  j[0]
-    setJugadoresNormalizado.add(j)
-
-
-#webscrapper.extraerDatosJugadores(setJugadores)
-print("Creacion cypher nodos Jugadores")
-procesarjugadores("jugadores.json")
-print("Fin")
+def ejecucionScript():
+    # Llamar a la función para procesar todos los archivos en la carpeta "datosPartidas/pgnTorneos"
+    print("Extraccion datos pgn to Cypher")
+    procesar_archivos_en_carpeta("datosPartidas/pgnTorneos", 100)
+    print("-Terminado-")
+    print("Extraccion datos jugadores de la pagina")
+    webscrapper.extraerDatosJugadores(setJugadores)
+    print("-Terminado-")
+    print("Jugadores to Cypher")
+    procesarjugadores("jugadores.json")
+    print("-Terminado-")

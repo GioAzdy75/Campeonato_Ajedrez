@@ -1,5 +1,6 @@
 from neo4j import GraphDatabase
 import os
+import partidasTwicc
 
 # Establecer la conexión con Neo4j
 uri = "bolt://localhost:7687"  # Cambia la URL según sea necesario
@@ -45,7 +46,7 @@ def procesar_archivos_en_carpeta(carpeta, max_partidas=30):
             ejecutar_archivo_cql(archivo_path)
 
 print("-Inicio programa-")
-archivo_cypher = 'datosPartidas/'  # Reemplaza con la ruta a tu archivo .cql
-procesar_archivos_en_carpeta(archivo_cypher)
-
+partidasTwicc.ejecucionScript()
+ejecutar_archivo_cql('datosPartidas/jugadores.cypher')
+procesar_archivos_en_carpeta('datosPartidas/cypherCode/')
 print('-Fin-')

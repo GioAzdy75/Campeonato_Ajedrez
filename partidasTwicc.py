@@ -203,7 +203,7 @@ def procesarjugadores(json_path, index = ''):
     cypher = generar_codigo_cypher_jugadores_y_federaciones(jugadores_json)
     cypher_lines.append(cypher)
             
-    with open(f"datosPartidas\jugadores{index}.cypher", "w", encoding="utf-8") as f:
+    with open(f"datosPartidas/jugadores{index}.cypher", "w", encoding="utf-8") as f:
         f.write("\n\n".join(cypher_lines))
 
     print(f"Archivo '{json_path.split('/')[-1]}' procesado correctamente.")

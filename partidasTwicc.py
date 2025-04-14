@@ -2,7 +2,7 @@ import chess.pgn
 import os
 import webscrapper
 import json
-
+import requests
 
 jugadoresDicNombres = {"Carlsen,M": "Carlsen, Magnus"}
 
@@ -16,9 +16,29 @@ def normalizarNombres(name, hash):
     '''Vemos realmente si vamos a implementar esta, creeria que no'''
     return hash.get(name, name) 
 
-def normalizarAperturas(key):
-    '''convierte la key  de las aperturas en su nombre exacto, ej C88 = Ruy Lopez '''
-    pass
+def normalizarAperturas(moves):
+    # Convertir movimientos a una lista de UCI
+    movimientos_uci = [move.uci() for move in moves]
+    # Unir los movimientos en una cadena separada por comas
+    cadena_uci = ",".join(movimientos_uci)
+    # Obtener la apertura en formato Lichess
+    url = f"https://explorer.lichess.ovh/masters?play={cadena_uci}"
+    # Obtener el nombre de la apertura desde la API de Lichess
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            # Verificar si hay resultados
+            if data['opening']:
+                apertura = data['opening']['name']
+                return apertura
+            else:
+                return "Apertura desconocida"
+        else:
+            return "Error en la API de Lichess"
+    except requests.RequestException as e:
+        return f"Error de conexión: {e}"
+
 
 def normalizarResultado(key):
     if "1-0" == key:
@@ -38,9 +58,10 @@ def extraer_datos_partida(pgn_game, idx):
     blanca = headers.get("White", "")
     negra = headers.get("Black", "")
     ronda = headers.get("Round", "")
-    apertura = headers.get("ECO", "")
+    ECO = headers.get("ECO", "")
     id_partida = headers.get("Site", f"pgn-{idx}").split("/")[-1] + f"-{idx}"
     cantidad_movimientos = pgn_game.end().board().fullmove_number
+    movimientos = pgn_game.mainline_moves()
     
     procesar_nombre(blanca)
     procesar_nombre(negra)
@@ -66,7 +87,7 @@ def extraer_datos_partida(pgn_game, idx):
             }})
 
             MERGE ({a}:Apertura {{
-                nombre: "{apertura}"
+                nombre: "{normalizarAperturas(movimientos)}"
             }})
 
             MERGE ({r}:Resultado {{
@@ -164,7 +185,7 @@ def generar_codigo_cypher_jugadores_y_federaciones(jugadores_json):
             eloClasico: "{elo_clasico}",
             nacimiento: "{nacimiento}"
         }})
-        
+
         // Relación del jugador con la federación
         MERGE (j_{index})-[:PERTENECE_A_UNA]->({federaciones[federacion]})
         """
@@ -182,7 +203,7 @@ def procesarjugadores(json_path, index = ''):
     cypher = generar_codigo_cypher_jugadores_y_federaciones(jugadores_json)
     cypher_lines.append(cypher)
             
-    with open(f"datosPartidas/jugadores{index}.cypher", "w", encoding="utf-8") as f:
+    with open(f"datosPartidas\jugadores{index}.cypher", "w", encoding="utf-8") as f:
         f.write("\n\n".join(cypher_lines))
 
     print(f"Archivo '{json_path.split('/')[-1]}' procesado correctamente.")

@@ -232,3 +232,210 @@ async function consultarTasaPorColorCompleta() {
     }
   });
 }
+
+
+
+// Organizadores
+async function consultarAperturaPopular() {
+  const nombre = document.getElementById("nombre-campeonato-apertura").value;
+  const res = await fetch(`${API_BASE}/torneo/apertura-popular?campeonato=${encodeURIComponent(nombre)}`);
+  const data = await res.json();
+  const tabla = document.getElementById("tabla-apertura-popular");
+  tabla.innerHTML = `<tr><th>Apertura</th><th>Veces</th></tr>`;
+  data.forEach(ap => {
+    tabla.innerHTML += `<tr><td>${ap.apertura}</td><td>${ap.veces}</td></tr>`;
+  });
+}
+
+async function consultarFederacionesParticipantes() {
+  const nombre = document.getElementById("nombre-campeonato-fed").value;
+  const res = await fetch(`${API_BASE}/torneo/federaciones?campeonato=${encodeURIComponent(nombre)}`);
+  const data = await res.json();
+  const resultado = document.getElementById("resultado-federaciones");
+  const tabla = document.getElementById("tabla-federaciones");
+  resultado.innerHTML = `Cantidad: ${data.cantidad}`;
+  tabla.innerHTML = `<tr><th>Federación</th></tr>`;
+  data.federaciones.forEach(fed => {
+    tabla.innerHTML += `<tr><td>${fed.federacion}</td></tr>`;
+  });
+}
+
+async function consultarMejorJugador() {
+  const nombre = document.getElementById("nombre-campeonato-mejor").value;
+  const res = await fetch(`${API_BASE}/torneo/mejor-jugador?campeonato=${encodeURIComponent(nombre)}`);
+  const data = await res.json();
+  const tabla = document.getElementById("tabla-mejor-jugador");
+  tabla.innerHTML = `<tr><th>Jugador</th><th>Victorias</th></tr>`;
+  if (data.length > 0) {
+    const maxVictorias = data[0].victorias;
+    data.forEach(j => {
+      if (j.victorias === maxVictorias) {
+        tabla.innerHTML += `<tr><td>${j.jugador}</td><td>${j.victorias}</td></tr>`;
+      }
+    });
+  } else {
+    tabla.innerHTML += `<tr><td colspan='2'>No se encontraron resultados.</td></tr>`;
+  }
+}
+
+async function consultarTasaEmpates() {
+  const nombre = document.getElementById("nombre-campeonato-empates").value;
+  const res = await fetch(`${API_BASE}/torneo/tasa-empates?campeonato=${encodeURIComponent(nombre)}`);
+  const data = await res.json();
+  const tabla = document.getElementById("tabla-tasa-empates");
+  tabla.innerHTML = `<tr><th>Total</th><th>Empates</th><th>Tasa %</th></tr>`;
+  if (data.length > 0) {
+    const row = data[0];
+    tabla.innerHTML += `<tr><td>${row.total}</td><td>${row.empates}</td><td>${row.tasa_empates.toFixed(2)}%</td></tr>`;
+  } else {
+    tabla.innerHTML += `<tr><td colspan='3'>No se encontraron partidas con empates.</td></tr>`;
+  }
+}
+
+
+async function consultarTasaVs() {
+  const jugador = document.getElementById("tasa-vs-jugador").value;
+  const rival = document.getElementById("tasa-vs-rival").value;
+  const res = await fetch(`${API_BASE}/jugador/tasa-vs?jugador=${encodeURIComponent(jugador)}&vs=${encodeURIComponent(rival)}`);
+  const data = await res.json();
+  const tbody = document.getElementById("tabla-tasa-vs-body");
+  tbody.innerHTML = "";
+
+  if (data.length > 0) {
+    data.forEach(row => {
+      tbody.innerHTML += `<tr>
+        <td>${row.jugador}</td>
+        <td>${row.contra}</td>
+        <td>${row.total}</td>
+        <td>${row.victorias}</td>
+        <td>${row.empates}</td>
+        <td>${row.derrotas}</td>
+        <td>${row.tasa_victoria.toFixed(2)}%</td>
+        <td>${row.tasa_empate.toFixed(2)}%</td>
+        <td>${row.tasa_derrota.toFixed(2)}%</td>
+      </tr>`;
+    });
+  } else {
+    tbody.innerHTML = `<tr><td colspan="9">No se encontraron enfrentamientos.</td></tr>`;
+  }
+}
+
+async function consultarRivalFrecuente() {
+  const jugador = document.getElementById("rival-frecuente-jugador").value;
+  const res = await fetch(`${API_BASE}/jugador/rival-frecuente?jugador=${encodeURIComponent(jugador)}`);
+  const data = await res.json();
+  const tabla = document.getElementById("tabla-rival-frecuente");
+  tabla.innerHTML = `<tr><th>Rival</th><th>Veces</th></tr>`;
+  data.forEach(row => {
+    tabla.innerHTML += `<tr><td>${row.rival}</td><td>${row.veces}</td></tr>`;
+  });
+}
+
+
+async function mostrarResumenBase() {
+  const res = await fetch(`${API_BASE}/resumen-base`);
+  const data = await res.json();
+  const contenedor = document.getElementById("resumen-base");
+  contenedor.innerHTML = `
+    <p><strong>Partidas:</strong> ${data.partidas}</p>
+    <p><strong>Jugadores:</strong> ${data.jugadores}</p>
+    <p><strong>Campeonatos:</strong> ${data.campeonatos}</p>
+  `;
+}
+
+mostrarResumenBase();
+
+
+async function consultarEvolucionJugador() {
+  const jugador = document.getElementById("evolucion-jugador").value;
+  const limite = document.getElementById("evolucion-limite").value || 30;
+  const res = await fetch(`${API_BASE}/jugador/evolucion?jugador=${encodeURIComponent(jugador)}&limite=${encodeURIComponent(limite)}`);
+  let data = await res.json();
+  const ctx = document.getElementById("grafico-evolucion").getContext("2d");
+
+  data = data.reverse(); // invertir el orden siempre
+
+  let puntaje = 0;
+  const labels = [];
+  const scores = [];
+
+  data.forEach((evento) => {
+    if (evento.resultado === "victoria") puntaje += 1;
+    else if (evento.resultado === "derrota") puntaje -= 1;
+    labels.push(evento.fecha);
+    scores.push(puntaje);
+  });
+
+  if (window.evolucionChart) {
+    window.evolucionChart.destroy();
+  }
+
+  window.evolucionChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Evolución acumulada",
+        data: scores,
+        borderColor: "blue",
+        fill: false,
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: { beginAtZero: false }
+      }
+    }
+  });
+}
+
+
+
+//Basicas
+async function consultarFederacionJugador() {
+  const jugador = document.getElementById("federacion-jugador").value;
+  const res = await fetch(`${API_BASE}/jugador/federacion?jugador=${encodeURIComponent(jugador)}`);
+  const data = await res.json();
+  const contenedor = document.getElementById("resultado-federacion");
+  contenedor.innerHTML = data.federacion ? `Federación: <strong>${data.federacion}</strong>` : "No se encontró federación.";
+}
+
+async function consultarCampeonatosJugador() {
+  const jugador = document.getElementById("campeonatos-jugador").value;
+  const res = await fetch(`${API_BASE}/jugador/campeonatos?jugador=${encodeURIComponent(jugador)}`);
+  const data = await res.json();
+  const lista = document.getElementById("lista-campeonatos");
+  lista.innerHTML = "";
+  data.forEach(c => {
+    const li = document.createElement("li");
+    li.textContent = c.campeonato;
+    lista.appendChild(li);
+  });
+}
+
+async function consultarPartidasPorCampeonato() {
+  const campeonato = document.getElementById("partidas-campeonato").value;
+  const res = await fetch(`${API_BASE}/campeonato/partidas?campeonato=${encodeURIComponent(campeonato)}`);
+  const data = await res.json();
+  const tabla = document.getElementById("tabla-partidas-campeonato");
+  tabla.innerHTML = `<tr><th>Nombre</th><th>Fecha</th><th>Ronda</th></tr>`;
+  data.forEach(p => {
+    tabla.innerHTML += `<tr><td>${p.partida}</td><td>${p.fecha}</td><td>${p.ronda}</td></tr>`;
+  });
+}
+
+async function consultarJugadoresFederacion() {
+  const federacion = document.getElementById("jugadores-federacion").value;
+  const res = await fetch(`${API_BASE}/federacion/jugadores?federacion=${encodeURIComponent(federacion)}`);
+  const data = await res.json();
+  const tabla = document.getElementById("tabla-jugadores-federacion");
+  tabla.innerHTML = `<tr><th>Jugador</th><th>Título</th><th>Elo</th></tr>`;
+  data.forEach(j => {
+    tabla.innerHTML += `<tr><td>${j.jugador}</td><td>${j.titulo}</td><td>${j.eloClasico}</td></tr>`;
+  });
+}

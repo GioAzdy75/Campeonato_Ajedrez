@@ -9,35 +9,34 @@
 <body>
   <header>Panel de Consultas - Base de Datos Ajedrez</header>
   <main>
-
+    <section id="resumen-base"></section>
     <section>
       <h2>Federación de un jugador</h2>
-      <input type="text" id="jugador-fed" placeholder="Nombre del jugador">
-      <button onclick="consultarFederacion()">Consultar</button>
-      <div id="resultado-fed"></div>
+      <input type="text" id="federacion-jugador" placeholder="Nombre del jugador">
+      <button onclick="consultarFederacionJugador()">Consultar</button>
+      <div id="resultado-federacion"></div>
     </section>
-
+    
     <section>
       <h2>Campeonatos jugados por un jugador</h2>
-      <input type="text" id="jugador-campeonatos" placeholder="Nombre del jugador">
-      <button onclick="consultarCampeonatos()">Consultar</button>
+      <input type="text" id="campeonatos-jugador" placeholder="Nombre del jugador">
+      <button onclick="consultarCampeonatosJugador()">Consultar</button>
       <ul id="lista-campeonatos"></ul>
     </section>
-
+    
     <section>
-      <h2>Partidas en un campeonato</h2>
-      <input type="text" id="nombre-campeonato" placeholder="Nombre del campeonato">
-      <button onclick="consultarPartidasCampeonato()">Consultar</button>
-      <ul id="lista-partidas"></ul>
+      <h2>Partidas de un campeonato</h2>
+      <input type="text" id="partidas-campeonato" placeholder="Nombre del campeonato">
+      <button onclick="consultarPartidasPorCampeonato()">Consultar</button>
+      <table id="tabla-partidas-campeonato"></table>
     </section>
-
+    
     <section>
-      <h2>Jugadores por federación</h2>
-      <input type="text" id="nombre-federacion" placeholder="Nombre de la federación">
+      <h2>Jugadores de una federación</h2>
+      <input type="text" id="jugadores-federacion" placeholder="Nombre de la federación">
       <button onclick="consultarJugadoresFederacion()">Consultar</button>
-      <ul id="lista-jugadores-fed"></ul>
+      <table id="tabla-jugadores-federacion"></table>
     </section>
-
     <section>
       <h2>Partidas jugadas por un jugador (color y apertura)</h2>
       <input type="text" id="jugador-partidas" placeholder="Nombre del jugador">
@@ -46,44 +45,53 @@
     </section>
 
     <section>
-      <h2>Total de partidas y tasa de victoria</h2>
-      <input type="text" id="jugador-estadisticas" placeholder="Nombre del jugador">
-      <button onclick="consultarEstadisticas()">Consultar</button>
-      <div id="resultado-estadisticas"></div>
-    </section>
-
-    <section>
       <h2>Aperturas más frecuentes de un jugador</h2>
-      <input type="text" id="jugador-aperturas" placeholder="Nombre del jugador">
+      <input type="text" id="aperturas-jugador" placeholder="Nombre del jugador">
       <button onclick="consultarAperturasFrecuentes()">Consultar</button>
-      <ul id="lista-aperturas"></ul>
+      <table id="tabla-aperturas">
+        <thead>
+          <tr>
+            <th>Apertura</th>
+            <th>Color</th>
+            <th>Veces</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-aperturas-body"></tbody>
+      </table>
     </section>
+        
 
     <section>
-      <h2>Tasa de victoria frente a un jugador o federación</h2>
-      <input type="text" id="jugador-a" placeholder="Jugador base">
-      <input type="text" id="rival-o-fed" placeholder="Rival o Federación">
-      <select id="modo-comparacion">
-        <option value="jugador">Jugador</option>
-        <option value="federacion">Federación</option>
-      </select>
+      <h2>Tasa de victoria frente a un jugador</h2>
+      <input type="text" id="tasa-vs-jugador" placeholder="Jugador base">
+      <input type="text" id="tasa-vs-rival" placeholder="Rival">
       <button onclick="consultarTasaVs()">Consultar</button>
-      <div id="resultado-vs"></div>
+      <table id="tabla-tasa-vs">
+        <thead>
+          <tr>
+            <th>Jugador</th>
+            <th>Contra</th>
+            <th>Total</th>
+            <th>Victorias</th>
+            <th>Empates</th>
+            <th>Derrotas</th>
+            <th>% Victorias</th>
+            <th>% Empates</th>
+            <th>% Derrotas</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-tasa-vs-body"></tbody>
+      </table>
     </section>
-
+    
+    
     <section>
       <h2>Rival más frecuente de un jugador</h2>
-      <input type="text" id="jugador-rival" placeholder="Nombre del jugador">
+      <input type="text" id="rival-frecuente-jugador" placeholder="Nombre del jugador">
       <button onclick="consultarRivalFrecuente()">Consultar</button>
-      <div id="resultado-rival"></div>
+      <table id="tabla-rival-frecuente"></table>
     </section>
-
-    <section>
-      <h2>Apertura más exitosa en un año</h2>
-      <input type="text" id="anio-apertura-exitosa" placeholder="Ej: 2023">
-      <button onclick="consultarAperturaMasExitosa()">Consultar</button>
-      <div id="resultado-apertura-exitosa"></div>
-    </section>
+    
 
     <section>
       <h2>Estadísticas de aperturas por año</h2>
@@ -104,6 +112,48 @@
     </section>
     
     
+    <section>
+      <h2>Apertura más popular en el torneo</h2>
+      <input type="text" id="nombre-campeonato-apertura" placeholder="Nombre del campeonato">
+      <button onclick="consultarAperturaPopular()">Consultar</button>
+      <table id="tabla-apertura-popular"></table>
+    </section>
+
+    <section>
+      <h2>Federaciones participantes</h2>
+      <input type="text" id="nombre-campeonato-fed" placeholder="Nombre del campeonato">
+      <button onclick="consultarFederacionesParticipantes()">Consultar</button>
+      
+      <div id="resultado-federaciones"></div>
+      <ul id="lista-federaciones"></ul>
+      <table id="tabla-federaciones"></table>
+    </section>
+
+    <section>   
+      <h2>Mejor jugador del torneo</h2>
+      <input type="text" id="nombre-campeonato-mejor" placeholder="Nombre del campeonato">
+      <button onclick="consultarMejorJugador()">Consultar</button>
+      <div id="resultado-mejor-jugador"></div>
+      <table id="tabla-mejor-jugador"></table>
+    </section>
+
+    <section>
+      <h2>Tasa de empates del torneo</h2>
+      <input type="text" id="nombre-campeonato-empates" placeholder="Nombre del campeonato">
+      <button onclick="consultarTasaEmpates()">Consultar</button>
+      <div id="resultado-tasa-empates"></div>
+      <table id="tabla-tasa-empates"></table>
+    </section>
+
+    <section>
+    <h2>Evolucion del Jugador</h2>
+    <input type="text" id="evolucion-jugador" placeholder="Nombre del jugador">
+    <input type="number" id="evolucion-limite" placeholder="Cantidad de partidas" value="30">
+    <button onclick="consultarEvolucionJugador()">Consultar evolución</button>
+    <canvas id="grafico-evolucion" height="200"></canvas>
+    </section>
+
+
   </main>
   <script src="consultas.js"></script>
 </body>

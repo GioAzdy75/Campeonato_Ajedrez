@@ -1,2 +1,5 @@
 env-CampeonatoAjedrez/
 __pycache__
+datosPartidas/
+jugadores.json
+

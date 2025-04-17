@@ -3,6 +3,11 @@ import os
 import webscrapper
 import json
 import requests
+import time
+
+from aperturas import cargar_aperturas,obtener_apertura_de_partida
+#Cargar Diccionario de apertruras
+aperturas = cargar_aperturas()
 
 jugadoresDicNombres = {"Carlsen,M": "Carlsen, Magnus"}
 
@@ -24,6 +29,7 @@ def normalizarAperturas(moves):
     # Obtener la apertura en formato Lichess
     url = f"https://explorer.lichess.ovh/masters?play={cadena_uci}"
     # Obtener el nombre de la apertura desde la API de Lichess
+    time.sleep(1)
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -35,7 +41,8 @@ def normalizarAperturas(moves):
             else:
                 return "Apertura desconocida"
         else:
-            return "Error en la API de Lichess"
+            print("Error en la API de Lichess")
+            return moves
     except requests.RequestException as e:
         return f"Error de conexión: {e}"
 
@@ -58,10 +65,11 @@ def extraer_datos_partida(pgn_game, idx):
     blanca = headers.get("White", "")
     negra = headers.get("Black", "")
     ronda = headers.get("Round", "")
-    ECO = headers.get("ECO", "")
+    eco = headers.get("ECO", "")
     id_partida = headers.get("Site", f"pgn-{idx}").split("/")[-1] + f"-{idx}"
     cantidad_movimientos = pgn_game.end().board().fullmove_number
     movimientos = pgn_game.mainline_moves()
+    print(movimientos)
     
     procesar_nombre(blanca)
     procesar_nombre(negra)
@@ -87,7 +95,7 @@ def extraer_datos_partida(pgn_game, idx):
             }})
 
             MERGE ({a}:Apertura {{
-                nombre: "{normalizarAperturas(movimientos)}"
+                nombre: "{obtener_apertura_de_partida(pgn_game,aperturas)}"
             }})
 
             MERGE ({r}:Resultado {{

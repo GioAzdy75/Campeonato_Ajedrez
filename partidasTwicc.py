@@ -18,7 +18,7 @@ def procesar_nombre(nombre):
         setJugadores.add(nombre)
 
 def normalizarNombres(name, hash):
-    '''Vemos realmente si vamos a implementar esta, creeria que no'''
+    '''Implementar en caso de querer unir datos de diversas fuentes y no duplicar nodos con el mismo nombre'''
     return hash.get(name, name) 
 
 def normalizarAperturas(moves):
@@ -117,23 +117,6 @@ def extraer_datos_partida(pgn_game, idx):
             """.strip()
 
 
-'''
-def procesar_pgn_twic(pgn_path, max_partidas=30):
-    cypher_lines = []
-    with open(pgn_path, encoding="utf-8") as f:
-        for idx in range(max_partidas):
-            game = chess.pgn.read_game(f)
-            if game is None:
-                break
-            cypher = extraer_datos_partida(game, idx+1)
-            cypher_lines.append(cypher)
-            
-    with open("datosPartidas/twic_partidas.cypher", "w", encoding="utf-8") as f:
-        f.write("\n\n".join(cypher_lines))
-
-    print("Archivo 'twic_partidas3.cypher' generado correctamente.")
-
-'''
 def procesar_pgn_twic(pgn_path, max_partidas=30 , index = ''):
     '''abre el archivo pgn y ejecuta la traduccion guardando los archivos'''
     cypher_lines = []
@@ -226,5 +209,5 @@ def ejecucionScript():
     webscrapper.extraerDatosJugadores(setJugadores)
     print("-Terminado-")
     print("Jugadores to Cypher")
-    procesarjugadores("jugadores.json")
+    procesarjugadores("datosPartidas/jugadores.json")
     print("-Terminado-")

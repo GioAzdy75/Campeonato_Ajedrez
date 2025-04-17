@@ -15,7 +15,7 @@ def obtener_datos_jugador(nombre_jugador):
     if response.status_code != 200:
         print(f"Error al acceder a la página: {url}")
         return None
-    
+        
     soup = BeautifulSoup(response.text, 'html.parser')
     
     try:
@@ -30,18 +30,15 @@ def obtener_datos_jugador(nombre_jugador):
         }
         return info
     except Exception as e:
-        print(f"⚠️ Error al extraer datos de {nombre_jugador}: {e}")
+        print(f"Error al extraer datos de {nombre_jugador}: {e}")
         return None
 
-def guardar_en_json(lista_datos, nombre_archivo="jugadores.json"):
+def guardar_en_json(lista_datos, nombre_archivo="datosPartidas/jugadores.json"):
     with open(nombre_archivo, "w", encoding="utf-8") as f:
         json.dump(lista_datos, f, ensure_ascii=False, indent=4)
-    print(f"\n✅ Datos guardados en {nombre_archivo}")
-
-# Set de nombres de jugadores
+    print(f"\n Datos guardados en {nombre_archivo}")
 
 # Obtener datos de todos los jugadores
-
 def extraerDatosJugadores(jugadores):
     datos_completos = []
     for nombre in jugadores:
@@ -53,4 +50,3 @@ def extraerDatosJugadores(jugadores):
 
     # Guardar todos los datos en un solo JSON
     guardar_en_json(datos_completos)
-

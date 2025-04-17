@@ -2,4 +2,5 @@ env-CampeonatoAjedrez/
 __pycache__
 datosPartidas/
 jugadores.json
-
+pruebas.py
+config.py

@@ -231,3 +231,9 @@ WHERE c.fechaInicio STARTS WITH "2023"
 RETURN pais.nombre AS pais, count(*) AS torneos
 ORDER BY torneos DESC
 ```
+
+
+
+
+## tsv con las aperturas
+extraido del repo: https://github.com/lichess-org/chess-openings/

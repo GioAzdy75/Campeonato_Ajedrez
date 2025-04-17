@@ -108,3 +108,127 @@ async function consultarEstadisticasAperturasPorAnio() {
     tabla.innerHTML += `<tr><td>${row.apertura}</td><td>${row.total_partidas}</td><td>${row.victorias_blancas}</td><td>${row.victorias_negras}</td><td>${row.tablas}</td><td>${row.porcentaje_victoria_total.toFixed(2)}%</td></tr>`;
   });
 }
+async function consultarTasaPorColorCompleta() {
+  const nombre = document.getElementById("jugador-color-tasa").value;
+  const res = await fetch(`${API_BASE}/jugador/tasa-color?nombre=${encodeURIComponent(nombre)}`);
+  const data = await res.json();
+
+  const tabla = document.getElementById("tabla-color-tasa");
+  const grafico = document.getElementById("grafico-color-tasa");
+  const graficoTorta = document.getElementById("grafico-torta-color").getContext("2d");
+
+  tabla.innerHTML = `<tr>
+    <th>Color</th>
+    <th>Total</th>
+    <th>Victorias</th>
+    <th>Empates</th>
+    <th>Derrotas</th>
+    <th>% Victorias</th>
+    <th>% Empates</th>
+    <th>% Derrotas</th>
+  </tr>`;
+
+  const labels = [];
+  const datosVictorias = [];
+  const datosEmpates = [];
+  const datosDerrotas = [];
+
+  let totalGlobal = 0;
+  let totalVictorias = 0;
+  let totalEmpates = 0;
+  let totalDerrotas = 0;
+
+  data.forEach(row => {
+    const colorRow = row.color === "blanca" ? "#e3fceb" : "#e3ecfc";
+    tabla.innerHTML += `<tr style="background-color: ${colorRow};">
+      <td>${row.color}</td>
+      <td>${row.total}</td>
+      <td>${row.victorias}</td>
+      <td>${row.empates}</td>
+      <td>${row.derrotas}</td>
+      <td>${row.tasa_victoria.toFixed(2)}%</td>
+      <td>${row.tasa_empate.toFixed(2)}%</td>
+      <td>${row.tasa_derrota.toFixed(2)}%</td>
+    </tr>`;
+
+    labels.push(row.color);
+    datosVictorias.push(row.tasa_victoria);
+    datosEmpates.push(row.tasa_empate);
+    datosDerrotas.push(row.tasa_derrota);
+
+    totalGlobal += row.total;
+    totalVictorias += row.victorias;
+    totalEmpates += row.empates;
+    totalDerrotas += row.derrotas;
+  });
+
+  // Gráfico de barras
+  const ctx = document.getElementById("grafico-color-tasa").getContext("2d");
+  if (window.graficoColor) window.graficoColor.destroy();
+  window.graficoColor = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "% Victorias",
+          backgroundColor: "#4caf50",
+          data: datosVictorias
+        },
+        {
+          label: "% Empates",
+          backgroundColor: "#ffc107",
+          data: datosEmpates
+        },
+        {
+          label: "% Derrotas",
+          backgroundColor: "#f44336",
+          data: datosDerrotas
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: "top" },
+        title: {
+          display: true,
+          text: "Tasa de resultados por color"
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: value => value + "%"
+          }
+        }
+      }
+    }
+  });
+
+  // Gráfico de torta
+  if (window.graficoTorta) window.graficoTorta.destroy();
+  window.graficoTorta = new Chart(graficoTorta, {
+    type: "pie",
+    data: {
+      labels: ["Victorias", "Empates", "Derrotas"],
+      datasets: [{
+        data: [totalVictorias, totalEmpates, totalDerrotas],
+        backgroundColor: ["#4caf50", "#ffc107", "#f44336"]
+      }]
+    },
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: "Distribución global de resultados"
+        },
+        legend: {
+          position: "bottom"
+        }
+      }
+    }
+  });
+}

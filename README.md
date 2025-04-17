@@ -235,5 +235,38 @@ ORDER BY torneos DESC
 
 
 
+## Buena Consulta
+🧩 2. Evaluar desempeño por tipo de apertura y color
+🟢 ¿Qué resuelve?
+
+    Saber si un jugador obtiene mejores resultados con blancas o negras, y contra qué aperturas obtiene más victorias o sufre más derrotas.
+    
+MATCH (j:Jugador {nombre: "Nepomniachtchi, Ian"})-[rel:JUGO_PARTIDA_COMO]->(p:Partida)-[:RESULTADO_DE_PARTIDA]->(r:Resultado)
+WITH 
+  rel.color AS color,
+  CASE
+    WHEN (rel.color = "blanca" AND r.nombre = "blancas") OR 
+         (rel.color = "negra" AND r.nombre = "negras") THEN "victoria"
+    WHEN r.nombre = "tablas" THEN "empate"
+    ELSE "derrota"
+  END AS resultado
+RETURN color, resultado, count(*) AS partidas
+ORDER BY color, resultado
+
+
 ## tsv con las aperturas
 extraido del repo: https://github.com/lichess-org/chess-openings/
+
+
+###
+
+MATCH (j:Jugador)-[:JUGO_PARTIDA_COMO]->(p:Partida)-[:RESULTADO_DE_PARTIDA]->(r:Resultado)
+WITH j, p, r,
+     toInteger(SUBSTRING(p.fecha, 0, 4)) AS anio_partida
+WHERE anio_partida - toInteger(j.nacimiento) < 20
+  AND (
+    (r.nombre = "blancas" AND EXISTS((j)-[:JUGO_PARTIDA_COMO {color: "blanca"}]->(p))) OR
+    (r.nombre = "negras" AND EXISTS((j)-[:JUGO_PARTIDA_COMO {color: "negra"}]->(p)))
+  )
+RETURN j.nombre AS jugador, count(*) AS victorias
+ORDER BY victorias DESC

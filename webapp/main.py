@@ -59,6 +59,49 @@ def jugadores_de_federacion(federacion: str):
     return conn.query(query, {"federacion": federacion})
 
 
+#
+@app.get("/jugador/aperturas-estadisticas")
+def aperturas_estadisticas(jugador: str):
+    query = """
+    MATCH (j:Jugador {nombre: $jugador})-[r:JUGO_PARTIDA_COMO]->(p:Partida)-[:TIENE_APERTURA]->(a:Apertura)
+    MATCH (p)-[:RESULTADO_DE_PARTIDA]->(res:Resultado)
+    WITH a.nombre AS apertura, r.color AS color, res.nombre AS resultado
+    WITH apertura, color,
+         count(*) AS veces,
+         count(CASE WHEN (resultado = "blancas" AND color = "blanca") OR (resultado = "negras" AND color = "negra") THEN 1 END) AS victorias,
+         count(CASE WHEN resultado = "tablas" THEN 1 END) AS empates,
+         count(CASE WHEN (resultado = "blancas" AND color = "negra") OR (resultado = "negras" AND color = "blanca") THEN 1 END) AS derrotas
+    RETURN apertura, color, veces, victorias, empates, derrotas,
+           toFloat(victorias) / veces * 100 AS porcentaje_victoria,
+           toFloat(empates) / veces * 100 AS porcentaje_empate,
+           toFloat(derrotas) / veces * 100 AS porcentaje_derrota
+    ORDER BY veces DESC LIMIT 5
+    """
+    return conn.query(query, {"jugador": jugador})
+
+
+#
+@app.get("/jugadores/partidas-entre")
+def partidas_entre_jugadores(jugador1: str, jugador2: str):
+    query = """
+    MATCH (j1:Jugador {nombre: $jugador1})-[:JUGO_PARTIDA_COMO]->(p:Partida)<-[:JUGO_PARTIDA_COMO]-(j2:Jugador {nombre: $jugador2})
+    MATCH (p)-[:TIENE_APERTURA]->(a:Apertura)
+    MATCH (p)-[:RESULTADO_DE_PARTIDA]->(r:Resultado)
+    OPTIONAL MATCH (blanco:Jugador)-[:JUGO_PARTIDA_COMO {color: "blanca"}]->(p)
+    OPTIONAL MATCH (negro:Jugador)-[:JUGO_PARTIDA_COMO {color: "negra"}]->(p)
+    OPTIONAL MATCH (c:Campeonato)-[:INCLUYE_PARTIDA]->(p)
+    RETURN
+      a.nombre AS apertura,
+      p.nombre AS partida,
+      p.fecha AS fecha,
+      p.ronda AS ronda,
+      r.nombre AS resultado,
+      blanco.nombre AS blancas,
+      negro.nombre AS negras,
+      c.nombre AS campeonato
+    ORDER BY a.nombre, p.fecha
+    """
+    return conn.query(query, {"jugador1": jugador1, "jugador2": jugador2})
 
 #
 @app.get("/jugador/evolucion")

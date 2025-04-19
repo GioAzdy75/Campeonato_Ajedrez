@@ -1,6 +1,7 @@
 // URL base de la API
 const API_BASE = "http://localhost:8000";
 
+//Federaciones
 async function consultarFederacion() {
   const nombre = document.getElementById("jugador-fed").value;
   const res = await fetch(`${API_BASE}/jugador/federacion?nombre=${encodeURIComponent(nombre)}`);
@@ -439,3 +440,78 @@ async function consultarJugadoresFederacion() {
     tabla.innerHTML += `<tr><td>${j.jugador}</td><td>${j.titulo}</td><td>${j.eloClasico}</td></tr>`;
   });
 }
+
+
+async function consultarEstadisticasAperturasJugador() {
+  const jugador = document.getElementById("estadisticas-aperturas-jugador").value;
+  const res = await fetch(`${API_BASE}/jugador/aperturas-estadisticas?jugador=${encodeURIComponent(jugador)}`);
+  const data = await res.json();
+  const tbody = document.getElementById("tabla-estadisticas-aperturas-body");
+  tbody.innerHTML = "";
+
+  data.forEach(row => {
+    tbody.innerHTML += `<tr>
+      <td>${row.apertura}</td>
+      <td>${row.color}</td>
+      <td>${row.veces}</td>
+      <td>${row.victorias}</td>
+      <td>${row.empates}</td>
+      <td>${row.derrotas}</td>
+      <td>${row.porcentaje_victoria.toFixed(2)}%</td>
+      <td>${row.porcentaje_empate.toFixed(2)}%</td>
+      <td>${row.porcentaje_derrota.toFixed(2)}%</td>
+    </tr>`;
+  });
+}
+
+async function consultarPartidasEntreJugadores() {
+  const j1 = document.getElementById("entre-jugador1").value;
+  const j2 = document.getElementById("entre-jugador2").value;
+  const res = await fetch(`${API_BASE}/jugadores/partidas-entre?jugador1=${encodeURIComponent(j1)}&jugador2=${encodeURIComponent(j2)}`);
+  const data = await res.json();
+  const contenedor = document.getElementById("resultado-partidas-entre");
+  contenedor.innerHTML = "";
+
+  const agrupadas = {};
+  data.forEach(row => {
+    if (!agrupadas[row.apertura]) agrupadas[row.apertura] = [];
+    agrupadas[row.apertura].push(row);
+  });
+
+  Object.entries(agrupadas).forEach(([apertura, partidas]) => {
+    const seccion = document.createElement("section");
+    seccion.innerHTML = `<h3>${apertura}</h3><table><thead><tr><th>Partida</th><th>Campeonato</th><th>Fecha</th><th>Ronda</th><th>Resultado</th><th>Blancas</th><th>Negras</th></tr></thead><tbody></tbody></table>`;
+    const tbody = seccion.querySelector("tbody");
+    partidas.forEach(p => {
+      tbody.innerHTML += `<tr>
+        <td>${p.partida}</td>
+        <td>${p.campeonato}</td>
+        <td>${p.fecha}</td>
+        <td>${p.ronda}</td>
+        <td>${p.resultado}</td>
+        <td>${p.blancas}</td>
+        <td>${p.negras}</td>
+      </tr>`;
+    });
+    contenedor.appendChild(seccion);
+  });
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Muestra resumen general al cargar
+  mostrarResumenBase();
+
+  // Detecta navegación a secciones y carga los datos si corresponde
+  document.querySelectorAll("a.nav-link").forEach(link => {
+    link.addEventListener("click", (e) => {
+      const target = link.getAttribute("href");
+
+      setTimeout(() => {
+        if (target === "#torneos") mostrarResumenTorneos();
+        if (target === "#federaciones") mostrarResumenFederaciones();
+      }, 200); // Delay pequeño por el scroll
+    });
+  });
+});

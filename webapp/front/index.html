@@ -46,17 +46,23 @@
 
     <section>
       <h2>Aperturas más frecuentes de un jugador</h2>
-      <input type="text" id="aperturas-jugador" placeholder="Nombre del jugador">
-      <button onclick="consultarAperturasFrecuentes()">Consultar</button>
-      <table id="tabla-aperturas">
+      <input type="text" id="estadisticas-aperturas-jugador" placeholder="Nombre del jugador">
+      <button onclick="consultarEstadisticasAperturasJugador()">Consultar</button>
+      <table id="tabla-estadisticas-aperturas">
         <thead>
           <tr>
             <th>Apertura</th>
             <th>Color</th>
             <th>Veces</th>
+            <th>Victorias</th>
+            <th>Empates</th>
+            <th>Derrotas</th>
+            <th>% Victoria</th>
+            <th>% Empate</th>
+            <th>% Derrota</th>
           </tr>
         </thead>
-        <tbody id="tabla-aperturas-body"></tbody>
+        <tbody id="tabla-estadisticas-aperturas-body"></tbody>
       </table>
     </section>
         
@@ -82,6 +88,15 @@
         </thead>
         <tbody id="tabla-tasa-vs-body"></tbody>
       </table>
+    </section>
+    
+
+    <section>
+      <h2>Partidas entre dos jugadores</h2>
+      <input type="text" id="entre-jugador1" placeholder="Jugador 1">
+      <input type="text" id="entre-jugador2" placeholder="Jugador 2">
+      <button onclick="consultarPartidasEntreJugadores()">Consultar</button>
+      <div id="resultado-partidas-entre"></div>
     </section>
     
     
